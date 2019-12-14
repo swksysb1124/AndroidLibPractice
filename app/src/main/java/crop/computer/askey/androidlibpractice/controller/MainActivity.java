@@ -6,15 +6,15 @@ import android.widget.ProgressBar;
 
 import crop.computer.askey.androidlib.activity.AppMvpBaseActivity;
 import crop.computer.askey.androidlibpractice.R;
-import crop.computer.askey.androidlibpractice.presenter.MainPresenter;
+import crop.computer.askey.androidlibpractice.presenter.MainPresenterI;
 import crop.computer.askey.androidlibpractice.view.MainFragment;
 import crop.computer.askey.androidlibpractice.view.SubFragment;
 
 
 public class MainActivity
-        extends AppMvpBaseActivity<MainPresenter> {
+        extends AppMvpBaseActivity<MainPresenterI> {
 
-    private MainPresenter mPresenter;
+    private MainPresenterI mPresenter;
 
     private MainFragment mainFragment;
 
@@ -26,7 +26,7 @@ public class MainActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mPresenter = new MainPresenter(this);
+        mPresenter = new MainPresenterI(this);
         mPresenter.start();
 
         toMainView();
@@ -62,7 +62,7 @@ public class MainActivity
 
 
     @Override
-    public MainPresenter getPresenter() {
+    public MainPresenterI getPresenter() {
         return mPresenter;
     }
 }

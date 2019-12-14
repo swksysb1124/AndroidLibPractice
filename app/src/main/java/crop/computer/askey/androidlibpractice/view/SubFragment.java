@@ -11,15 +11,15 @@ import android.widget.TextView;
 
 import crop.computer.askey.androidlibpractice.R;
 import crop.computer.askey.androidlibpractice.controller.MainActivity;
-import crop.computer.askey.androidlibpractice.presenter.MainPresenter;
+import crop.computer.askey.androidlibpractice.presenter.MainPresenterI;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class SubFragment extends Fragment
-    implements SubView{
+    implements SubViewI {
 
-    private MainPresenter mPresenter;
+    private MainPresenterI mPresenter;
 
     private TextView txtResult;
 
@@ -67,7 +67,7 @@ public class SubFragment extends Fragment
     }
 
     @Override
-    public void setPresenter(MainPresenter presenter) {
+    public void setPresenter(MainPresenterI presenter) {
         mPresenter = presenter;
     }
 

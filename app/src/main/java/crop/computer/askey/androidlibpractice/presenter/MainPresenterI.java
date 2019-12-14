@@ -6,42 +6,42 @@ import android.os.Looper;
 
 
 import crop.computer.askey.androidlib.http.remoteservice.ServiceDataReceiver;
-import crop.computer.askey.androidlib.mvp.BasePresenter;
+import crop.computer.askey.androidlib.mvp.IBasePresenter;
 import crop.computer.askey.androidlibpractice.controller.MainActivity;
 import crop.computer.askey.androidlibpractice.service.RemoteServiceImp;
-import crop.computer.askey.androidlibpractice.view.MainView;
-import crop.computer.askey.androidlibpractice.view.SubView;
+import crop.computer.askey.androidlibpractice.view.MainViewI;
+import crop.computer.askey.androidlibpractice.view.SubViewI;
 
 /**
  * Created by weikai on 2018/12/21.
  */
 
-public class MainPresenter
-        implements BasePresenter {
+public class MainPresenterI
+        implements IBasePresenter {
 
     private MainActivity mActivity;
 
     private RemoteServiceImp mRemoteServiceImp;
 
-    private MainView mMainView;
+    private MainViewI mMainView;
 
-    private SubView mSubView;
+    private SubViewI mSubView;
 
     private Context mContext;
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
 
-    public MainPresenter(Context context) {
+    public MainPresenterI(Context context) {
         mContext = context;
         mActivity = (MainActivity) context;
     }
 
 
-    public void setMainView(MainView mainView) {
+    public void setMainView(MainViewI mainView) {
         mMainView = mainView;
     }
 
-    public void setSubView(SubView subView) {
+    public void setSubView(SubViewI subView) {
         mSubView = subView;
     }
 

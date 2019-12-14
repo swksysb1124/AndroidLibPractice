@@ -1,6 +1,6 @@
 package crop.computer.askey.androidlib.mvp;
 
-public interface BaseModel {
+public interface IBaseModel {
     void registerCallback(Callback callback);
     void unregister(Callback callback);
 
