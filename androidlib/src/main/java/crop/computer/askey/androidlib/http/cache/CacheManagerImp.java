@@ -11,11 +11,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import crop.computer.askey.androidlib.http.util.TimeUtil;
+
 public class CacheManagerImp implements CacheManager<CacheData> {
 
     private static final String SP_CACHE_API_DATA = "sp.cache.api.data";
-    private static final String DATA_FORMAT_PATTERN = "yyyy-mm-dd hh:mm:ss";
-
     private WeakReference<Context> mContext;
 
     private CacheManagerImp(Context context) {
@@ -62,8 +62,7 @@ public class CacheManagerImp implements CacheManager<CacheData> {
     private String serializeCacheData(CacheData data) {
         StringBuilder sbuilder = new StringBuilder();
         sbuilder.append(data.getUrl()).append(";");
-        SimpleDateFormat sdf = new SimpleDateFormat(DATA_FORMAT_PATTERN, Locale.getDefault());
-        String time = sdf.format(data.getTime());
+        String time = TimeUtil.format(data.getTime());
         sbuilder.append(time).append(";");
         sbuilder.append(data.getData()).append(";");
         sbuilder.append(data.getExpire());
@@ -78,16 +77,10 @@ public class CacheManagerImp implements CacheManager<CacheData> {
         if (parts.length != 4) {
             throw new IllegalArgumentException("Illegal Row Data format of caching");
         }
-        SimpleDateFormat sdf = new SimpleDateFormat(DATA_FORMAT_PATTERN, Locale.getDefault());
 
         String url = parts[0];
 
-        Date time = null; // null => no caching
-        try {
-            time = sdf.parse(parts[1]);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        Date time = TimeUtil.parse(parts[1]);
 
         String data = parts[2];
 
