@@ -1,5 +1,7 @@
 package crop.computer.askey.androidlib.http.url;
 
+import android.support.annotation.Nullable;
+
 public interface URLConfigManager {
-	URLInfo findURL(String findKey);
+	@Nullable URLInfo findURL(String findKey);
 }

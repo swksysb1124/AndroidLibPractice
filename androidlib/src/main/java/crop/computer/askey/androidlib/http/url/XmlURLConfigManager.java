@@ -1,6 +1,7 @@
 package crop.computer.askey.androidlib.http.url;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -11,6 +12,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,42 +30,44 @@ public class XmlURLConfigManager
     private String[] filenames;
     private final List<URLInfo> urlList = new ArrayList<>();
 
-    private Context context;
+    private WeakReference<Context> context;
 
     public XmlURLConfigManager(Context context, String... filenames) {
         this.filenames = filenames;
-        this.context = context;
+        this.context = new WeakReference<>(context);
     }
 
+    @Nullable
     @Override
     public URLInfo findURL(String findKey) {
-        if(urlList == null || urlList.isEmpty()) {
-            for(String filename: filenames) {
+        if (urlList.isEmpty()) {
+            for (String filename : filenames) {
                 fetchUrlDataFromXml(filename);
             }
         }
 
-        for(URLInfo data: urlList) {
-            if(findKey.equals(data.getKey())) {
+        for (URLInfo data : urlList) {
+            if (findKey.equals(data.getKey())) {
                 return data;
             }
         }
         return null;
     }
 
-    public void fetchUrlDataFromXml(String filename) {
+    private void fetchUrlDataFromXml(String filename) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
-            InputStream is = context.getAssets().open(filename);
+            InputStream is = context.get().getAssets().open(filename);
             Document doc = builder.parse(is); // 以樹狀格式儲存在記憶體中
 
             Element root = doc.getDocumentElement();
-            System.out.println("loading service's url: "+root.getAttribute("name") + " ...");
+            System.out.println("loading service's url: " + root.getAttribute("name") + " ...");
 
             Node server = root.getElementsByTagName("server").item(0);
             String scheme = server.getAttributes().getNamedItem("scheme").getNodeValue();
             String host = server.getAttributes().getNamedItem("host").getNodeValue();
+            String port = server.getAttributes().getNamedItem("port").getNodeValue();
 
             NodeList nList = root.getElementsByTagName("api");
             for (int i = 0; i < nList.getLength(); i++) {
@@ -74,7 +78,7 @@ public class XmlURLConfigManager
                     long expires = Long.parseLong(attr.getNamedItem("expires").getNodeValue());
                     String method = attr.getNamedItem("method").getNodeValue();
                     String path = attr.getNamedItem("path").getNodeValue();
-                    urlList.add(new URLInfo(key, expires, method, scheme, host, path));
+                    urlList.add(new URLInfo(key, expires, method, scheme, host, port, path));
                 }
             }
         } catch (ParserConfigurationException e) {
