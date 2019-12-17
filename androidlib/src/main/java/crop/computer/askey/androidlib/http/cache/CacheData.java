@@ -4,6 +4,8 @@ import android.support.annotation.NonNull;
 
 import java.util.Date;
 
+import crop.computer.askey.androidlib.http.util.TimeUtil;
+
 public class CacheData {
     @NonNull private String url;
     @NonNull private Date time;
@@ -38,5 +40,9 @@ public class CacheData {
 
     public boolean isExpired(Date currentTime) {
         return (currentTime.getTime() - time.getTime()) > expire;
+    }
+
+    public boolean isExpired() {
+        return (TimeUtil.getCurrentTime().getTime() - time.getTime()) > expire;
     }
 }

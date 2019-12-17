@@ -11,4 +11,5 @@ public interface RemoteService extends RequestCallback {
 	
 	void finish();
 	void invoke(final String key, List<HeaderField> headers, List<QueryAttribute> queryAtts, final String requestBody, RequestCallback callback);
+	void invoke(String key, String method, String url, List<HeaderField> headers, String requestBody, RequestCallback callback);
 }

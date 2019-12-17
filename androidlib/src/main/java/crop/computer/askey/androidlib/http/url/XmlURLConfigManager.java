@@ -1,6 +1,7 @@
 package crop.computer.askey.androidlib.http.url;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.w3c.dom.Document;
@@ -37,7 +38,7 @@ public class XmlURLConfigManager
         this.context = new WeakReference<>(context);
     }
 
-    @Nullable
+    @NonNull
     @Override
     public URLInfo findURL(String findKey) {
         if (urlList.isEmpty()) {
@@ -51,7 +52,7 @@ public class XmlURLConfigManager
                 return data;
             }
         }
-        return null;
+        throw new IllegalArgumentException("No url info found");
     }
 
     private void fetchUrlDataFromXml(String filename) {

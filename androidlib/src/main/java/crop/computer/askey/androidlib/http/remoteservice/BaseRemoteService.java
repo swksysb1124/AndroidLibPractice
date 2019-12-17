@@ -1,5 +1,8 @@
 package crop.computer.askey.androidlib.http.remoteservice;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import java.util.List;
 
 import crop.computer.askey.androidlib.http.request.HeaderField;
@@ -21,7 +24,7 @@ public abstract class BaseRemoteService
 	
 	private URLConfigManager mURLConfigManager;
 	
-	private ServiceDataReceiver dataListener;
+	protected ServiceDataReceiver dataListener;
 	
 	public void registerDataReceiver(ServiceDataReceiver dataListener) {
 		this.dataListener = dataListener;
@@ -30,40 +33,37 @@ public abstract class BaseRemoteService
 	public void unregisterDataReceiver(){
 		this.dataListener = null;
 	}
-	
-	protected void invoke(final String key, List<HeaderField> rqProperties, List<QueryAttribute> rqParams,
+
+	protected abstract RequestManager injectRequestManager();
+	protected abstract URLConfigManager injectURLConfigManager();
+	protected abstract String interceptURLString(URLInfo urlInfo);
+
+
+	protected void invoke(final String key,
+						  List<HeaderField> headers,
+						  List<QueryAttribute> queries,
 						  final String requestBody) {
-		invoke(key, rqProperties, rqParams, requestBody, this);
+		invoke(key, headers, queries, requestBody, this);
 	}
 	
 	@Override
-	public void invoke(final String key, List<HeaderField> rqProperties, List<QueryAttribute> rqParams, 
-			final String requestBody, RequestCallback callback) {
-		
+	public void invoke(@NonNull final String key,
+					   @Nullable List<HeaderField> headers,
+					   @Nullable List<QueryAttribute> queries,
+					   @Nullable final String requestBody,
+					   @NonNull RequestCallback callback) {
+
 		final URLInfo urlInfo = getURLConfigManager().findURL(key);
-		if(urlInfo == null) {
-			callback.onFail(key, null, 5, "Cannot find the URLInfo for key: " + key);
-			return;
-		}
+
 		String url = generateDefaultURLString(urlInfo);
 		if(interceptURLString(urlInfo)!=null){
 			url = interceptURLString(urlInfo);
 		}
-		Request request;
-		if(url.startsWith("https")){
-			request = new HttpsRequest(url);
-		}else {
-			request = new HttpRequest(url);
+		if(queries != null) {
+			url = addRequestParameter(url, queries);
 		}
-		request.setKey(key);
-		request.setMethod(urlInfo.getMethod());
-		request.setRqProperties(rqProperties);
-		request.setRqParams(rqParams);
-		request.setBody(requestBody);
-		request.setCallback(callback);
 
-		getRequestManager().start();
-		getRequestManager().execute(request);
+		invoke(key, urlInfo.getMethod(), url, headers, requestBody, callback);
 	} 
 
 	public void cancelRequst() {
@@ -71,6 +71,31 @@ public abstract class BaseRemoteService
 	        getRequestManager().cancelRequests();
         }
     }
+
+	@Override
+	public void invoke(@NonNull String key,
+					   @NonNull String method,
+					   @NonNull String url,
+					   @Nullable List<HeaderField> headers,
+					   @Nullable String requestBody,
+					   @NonNull RequestCallback callback) {
+
+		Request request;
+		if(url.startsWith("https")){
+			request = new HttpsRequest(url);
+		}else {
+			request = new HttpRequest(url);
+		}
+		request.setKey(key);
+		request.setMethod(method);
+		request.setRqProperties(headers);
+		request.setRqParams(null);
+		request.setBody(requestBody);
+		request.setCallback(callback);
+
+		getRequestManager().start();
+		getRequestManager().execute(request);
+	}
 
 	private String generateDefaultURLString(URLInfo urlInfo) {
 		StringBuilder builder = new StringBuilder();
@@ -81,22 +106,35 @@ public abstract class BaseRemoteService
 		builder.append(urlInfo.getHost());
 		builder.append(urlInfo.getPath());
 		return builder.toString();
-	} 
-	
-	protected abstract RequestManager injectRequestManager();
-	protected abstract URLConfigManager injectURLConfigManager();
-	protected abstract String interceptURLString(URLInfo urlInfo);
+	}
 
+	private String addRequestParameter(@Nullable String urlStr, @NonNull List<QueryAttribute> rqParams) {
+		StringBuilder urlBuilder = new StringBuilder();
+		urlBuilder.append(urlStr);
+		if(!rqParams.isEmpty()) {
+			urlBuilder.append("?");
+			for(int i = 0; i < rqParams.size(); i++) {
+				QueryAttribute param = rqParams.get(i);
+				urlBuilder.append(param.key);
+				urlBuilder.append("=");
+				urlBuilder.append(param.value);
+				if(i != rqParams.size()-1) {
+					urlBuilder.append("&");
+				}
+			}
+		}
+		return urlBuilder.toString();
+	}
 
 	@Override
-	public void onSuccess(String key, Response response, String content) {
+	public void onSuccess(String key, String url, Response response, String content) {
 		if(dataListener != null) {
 			dataListener.onSuccess(key, content);
 		}
 	}
 
 	@Override
-	public void onFail(String key, Response response, int errorType, String errorMessage) {
+	public void onFail(String key, String url, Response response, int errorType, String errorMessage) {
 		if(dataListener != null) {
 			dataListener.onFail(key, errorType, errorMessage);
 		}
