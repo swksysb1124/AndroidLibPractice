@@ -72,6 +72,41 @@ public class SubFragment extends Fragment
     }
 
     @Override
+    public void showProgressBar(Object pbInfo) {
+
+    }
+
+    @Override
+    public void updateProgress(Object progress) {
+
+    }
+
+    @Override
+    public void hideProgressBar(Object pbInfo) {
+
+    }
+
+    @Override
+    public void showMessage(Object msgInfo) {
+
+    }
+
+    @Override
+    public void hideMessage(Object msgInfo) {
+
+    }
+
+    @Override
+    public void goToPage(Object pageInfo) {
+
+    }
+
+    @Override
+    public void runOnUiThread(Runnable task) {
+
+    }
+
+    @Override
     public void showPostResult(String result) {
         txtResult.setText(result);
     }
