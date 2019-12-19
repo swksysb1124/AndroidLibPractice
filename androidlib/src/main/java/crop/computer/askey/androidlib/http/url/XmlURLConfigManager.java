@@ -1,6 +1,7 @@
 package crop.computer.askey.androidlib.http.url;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.w3c.dom.Document;
@@ -37,7 +38,7 @@ public class XmlURLConfigManager
         this.context = new WeakReference<>(context);
     }
 
-    @Nullable
+    @NonNull
     @Override
     public URLInfo findURL(String findKey) {
         if (urlList.isEmpty()) {
@@ -51,7 +52,7 @@ public class XmlURLConfigManager
                 return data;
             }
         }
-        return null;
+        throw new IllegalArgumentException("No url info found");
     }
 
     private void fetchUrlDataFromXml(String filename) {
@@ -67,8 +68,10 @@ public class XmlURLConfigManager
             Node server = root.getElementsByTagName("server").item(0);
             String scheme = server.getAttributes().getNamedItem("scheme").getNodeValue();
             String host = server.getAttributes().getNamedItem("host").getNodeValue();
-            String port = server.getAttributes().getNamedItem("port").getNodeValue();
-
+            String port = null;
+            if(server.getAttributes().getNamedItem("port") != null) {
+                port = server.getAttributes().getNamedItem("port").getNodeValue();
+            }
             NodeList nList = root.getElementsByTagName("api");
             for (int i = 0; i < nList.getLength(); i++) {
                 Node node = nList.item(i);

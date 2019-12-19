@@ -87,9 +87,9 @@ public abstract class Request
 		Response response = getResponse(url, method, rqProperties, rqParams, body);
 		if(callback != null) {
 			if(!response.hasError()) {
-				callback.onSuccess(key, response, response.getResult());
+				callback.onSuccess(key, url, response, response.getResult());
 			}else {
-				callback.onFail(key, response, response.getErrorType(), response.getErrorMessage());
+				callback.onFail(key, url, response, response.getErrorType(), response.getErrorMessage());
 			}
 		}
 	}
