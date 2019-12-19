@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.lang.ref.WeakReference;
 import java.text.ParseException;
@@ -47,7 +48,7 @@ public class CacheManagerImp implements CacheManager<CacheData> {
     public CacheData getData(@NonNull String url) {
         SharedPreferences preferences = mContext.get()
                 .getSharedPreferences(SP_CACHE_API_DATA, Context.MODE_PRIVATE);
-        String rowData = preferences.getString(url, "");
+        String rowData = preferences.getString(url, null);
         return deserializeCacheData(rowData);
     }
 
@@ -62,14 +63,14 @@ public class CacheManagerImp implements CacheManager<CacheData> {
     private String serializeCacheData(CacheData data) {
         StringBuilder sbuilder = new StringBuilder();
         sbuilder.append(data.getUrl()).append(";");
-        String time = TimeUtil.format(data.getTime());
-        sbuilder.append(time).append(";");
+        sbuilder.append(data.getTime()).append(";");
         sbuilder.append(data.getData()).append(";");
         sbuilder.append(data.getExpire());
         return sbuilder.toString();
     }
 
     private CacheData deserializeCacheData(String rowData) {
+        Log.w("CacheManagerImp", "deserialize: rowDate=" + rowData);
         if (rowData == null) {
             return null;
         }
@@ -80,7 +81,7 @@ public class CacheManagerImp implements CacheManager<CacheData> {
 
         String url = parts[0];
 
-        Date time = TimeUtil.parse(parts[1]);
+        long time = Long.parseLong(parts[1]);
 
         String data = parts[2];
 

@@ -8,11 +8,11 @@ import crop.computer.askey.androidlib.http.util.TimeUtil;
 
 public class CacheData {
     @NonNull private String url;
-    @NonNull private Date time;
     @NonNull private String data;
+    private long time;
     private long expire; // unit: millisecond
 
-    public CacheData(@NonNull String url, @NonNull Date time, @NonNull String data, long expire) {
+    public CacheData(@NonNull String url, long time, @NonNull String data, long expire) {
         this.url = url;
         this.time = time;
         this.data = data;
@@ -29,8 +29,7 @@ public class CacheData {
         return data;
     }
 
-    @NonNull
-    public Date getTime() {
+    public long getTime() {
         return time;
     }
 
@@ -38,11 +37,17 @@ public class CacheData {
         return expire;
     }
 
-    public boolean isExpired(Date currentTime) {
-        return (currentTime.getTime() - time.getTime()) > expire;
+    public boolean isExpired(long currentTime) {
+        return (currentTime - time) > expire;
     }
 
-    public boolean isExpired() {
-        return (TimeUtil.getCurrentTime().getTime() - time.getTime()) > expire;
+    @Override
+    public String toString() {
+        String str = "";
+        str+="url: "+url+"\n";
+        str+="time: "+time+"\n";
+        str+="data: "+data+"\n";
+        str+="expire: "+expire;
+        return str;
     }
 }
