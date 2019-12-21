@@ -1,3 +1,4 @@
+apply plugin: 'com.novoda.bintray-release'
 apply plugin: 'com.android.library'
 
 android {
@@ -9,7 +10,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
-        versionName "0.2.0.1"
+        versionName "0.2.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -33,4 +34,20 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+}
+
+publish {
+
+    def groupProjectID = 'com.jasonstudio.jy.androidlib'
+    def artifactProjectID = 'androidlib'
+    def publishVersionID = '0.2.0'
+
+    userOrg = 'jasonstudio'
+    repoName = 'AndroidLibPractice'
+    groupId = groupProjectID
+    artifactId = artifactProjectID
+    publishVersion = publishVersionID
+    desc = 'An Android Library for Mobile API Service and MVP Framework'
+    website = 'https://github.com/swksysb1124/AndroidLibPractice'
+
 }
