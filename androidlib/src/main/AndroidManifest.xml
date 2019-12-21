@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="crop.computer.askey.androidlib">
+    package="com.jasonstudio.jy.androidlib">
 
     <application>
-        <activity android:name=".activity.AppMvpBaseActivity"></activity>
+        <activity android:name="com.jasonstudio.jy.androidlib.activity.AppMvpBaseActivity"></activity>
     </application>
 
 </manifest>
