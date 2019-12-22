@@ -1,16 +1,31 @@
-apply plugin: 'com.novoda.bintray-release'
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
+
+ext {
+
+    ORGANIZATION = 'jasonstudio' // Organization in Bintray
+    REPOSITORY = 'AndroidLibPractice' // Repository in given organization
+    PACKAGE_NAME = 'androidlib'
+    PACKAGE_DESCRIPTION = 'An Android Library for Mobile API Service and MVP Framework'
+    PACKAGE_GITHUB_URL = 'https://github.com/swksysb1124/AndroidLibPractice'
+
+    DEPENDENCY_GROUP_ID = 'com.jasonstudio.jy.androidlib'
+    DEPENDENCY_ARTIFACT_ID = PACKAGE_NAME // the same as the package name in Repository
+    DEPENDENCY_VERSION = '0.2.0'
+
+    BUILD_NUMBER = 3
+
+}
 
 android {
     compileSdkVersion 26
-
 
 
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
-        versionName "0.2.0"
+        versionName DEPENDENCY_VERSION + "." + BUILD_NUMBER
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -38,16 +53,12 @@ dependencies {
 
 publish {
 
-    def groupProjectID = 'com.jasonstudio.jy.androidlib'
-    def artifactProjectID = 'androidlib'
-    def publishVersionID = '0.2.0'
-
-    userOrg = 'jasonstudio'
-    repoName = 'AndroidLibPractice'
-    groupId = groupProjectID
-    artifactId = artifactProjectID
-    publishVersion = publishVersionID
-    desc = 'An Android Library for Mobile API Service and MVP Framework'
-    website = 'https://github.com/swksysb1124/AndroidLibPractice'
+    userOrg = ORGANIZATION
+    repoName = REPOSITORY
+    groupId = DEPENDENCY_GROUP_ID       // dependency group id
+    artifactId = DEPENDENCY_ARTIFACT_ID // dependency artifact id
+    publishVersion = DEPENDENCY_VERSION // dependency version
+    desc = PACKAGE_DESCRIPTION
+    website = PACKAGE_GITHUB_URL
 
 }

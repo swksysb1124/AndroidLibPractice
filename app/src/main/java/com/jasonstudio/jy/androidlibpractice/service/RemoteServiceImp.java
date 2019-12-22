@@ -53,7 +53,7 @@ public class RemoteServiceImp
     }
 
     @Override
-    protected String interceptURLString(URLInfo urlInfo) {
+    protected String interceptURLString(String url) {
         return null;
     }
 
