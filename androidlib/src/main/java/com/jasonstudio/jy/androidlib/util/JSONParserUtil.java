@@ -1,4 +1,4 @@
-package com.jasonstudio.jy.androidlib.http.util;
+package com.jasonstudio.jy.androidlib.util;
 
 import com.google.gson.Gson;
 

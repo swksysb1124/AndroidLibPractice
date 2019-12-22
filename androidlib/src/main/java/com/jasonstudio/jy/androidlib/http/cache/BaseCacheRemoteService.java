@@ -12,7 +12,7 @@ import com.jasonstudio.jy.androidlib.http.request.RequestCallback;
 import com.jasonstudio.jy.androidlib.http.response.Response;
 import com.jasonstudio.jy.androidlib.http.url.URLConfigManager;
 import com.jasonstudio.jy.androidlib.http.url.URLInfo;
-import com.jasonstudio.jy.androidlib.http.util.TimeUtil;
+import com.jasonstudio.jy.androidlib.util.TimeUtil;
 
 public abstract class BaseCacheRemoteService extends BaseRemoteService {
 
