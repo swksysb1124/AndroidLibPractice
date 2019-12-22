@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="10dp"
-    tools:context="crop.computer.askey.androidlibpractice.view.MainFragment">
+    tools:context="com.jasonstudio.jy.androidlibpractice.view.MainFragment">
 
     <TextView
         android:layout_width="match_parent"

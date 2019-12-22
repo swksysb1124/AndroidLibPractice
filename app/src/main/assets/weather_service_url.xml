@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service
+    name="Weather Service">
+
+    <server
+        scheme="http://"
+        host="www.weather.com.cn" />
+
+    <apis>
+        <api
+            key="GET-WEATHER_INFO"
+            path="/data/sk/101010100.html"
+            expires="5000"
+            method="GET" />
+
+    </apis>
+
+</service>
