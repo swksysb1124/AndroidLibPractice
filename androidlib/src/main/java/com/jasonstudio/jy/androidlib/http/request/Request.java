@@ -7,94 +7,111 @@ import com.jasonstudio.jy.androidlib.http.url.URLInfo;
 
 
 public abstract class Request
-	implements Runnable{
-	
-	private String key;
-	private String url;
-	private String method;
-	private List<HeaderField> rqProperties;
-	private List<QueryAttribute> rqParams;
-	private String body;
-	private RequestCallback callback;
-	
-	public Request(String url) {
-		this.url = url;
-	}
+        implements Runnable {
 
-	public String getMethod() {
-		return method;
-	}
+    private String key;
+    private String url;
+    private String method;
+    private List<HeaderField> rqProperties;
+    private List<QueryAttribute> rqParams;
+    private String body;
+    private RequestCallback callback;
 
-	public void setMethod(String method) {
-		this.method = method;
-	}
+    public Request(String url) {
+        this.url = url;
+    }
 
-	public List<HeaderField> getRqProperties() {
-		return rqProperties;
-	}
+    public String getMethod() {
+        return method;
+    }
 
-	public void setRqProperties(List<HeaderField> rqProperties) {
-		this.rqProperties = rqProperties;
-	}
+    public void setMethod(String method) {
+        this.method = method;
+    }
 
-	public List<QueryAttribute> getRqParams() {
-		return rqParams;
-	}
+    public List<HeaderField> getRqProperties() {
+        return rqProperties;
+    }
 
-	public void setRqParams(List<QueryAttribute> rqParams) {
-		this.rqParams = rqParams;
-	}
+    public void setRqProperties(List<HeaderField> rqProperties) {
+        this.rqProperties = rqProperties;
+    }
 
-	public String getBody() {
-		return body;
-	}
+    public List<QueryAttribute> getRqParams() {
+        return rqParams;
+    }
 
-	public void setBody(String body) {
-		this.body = body;
-	}
+    public void setRqParams(List<QueryAttribute> rqParams) {
+        this.rqParams = rqParams;
+    }
 
-	public String getURL() {
-		return url;
-	}
+    public String getBody() {
+        return body;
+    }
 
-	public void setCallback(RequestCallback callback) {
-		this.callback = callback;
-	}
-	
+    public void setBody(String body) {
+        this.body = body;
+    }
 
-	public String getKey() {
-		return key;
-	}
+    public String getURL() {
+        return url;
+    }
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+    public void setCallback(RequestCallback callback) {
+        this.callback = callback;
+    }
 
-	public String getUrl() {
-		return url;
-	}
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
+    public String getKey() {
+        return key;
+    }
 
-	public RequestCallback getCallback() {
-		return callback;
-	}
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-	@Override
-	public void run() {
-		Response response = getResponse(url, method, rqProperties, rqParams, body);
-		if(callback != null) {
-			if(!response.hasError()) {
-				callback.onSuccess(key, url, response, response.getResult());
-			}else {
-				callback.onFail(key, url, response, response.getErrorType(), response.getErrorMessage());
-			}
-		}
-	}
-	
-	protected abstract String createURLString(final URLInfo urlInfo);
-	protected abstract Response getResponse(String urlStr, String method, List<HeaderField> rqProperties, List<QueryAttribute> rqParams, String body);
-	
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    @Deprecated
+    public RequestCallback getCallback() {
+        return callback;
+    }
+
+    @Override
+    public void run() {
+        Response response = getResponse(url, method, rqProperties, rqParams, body);
+        if (callback != null) {
+            if (!response.hasError()) {
+                callback.onSuccess(key, url, response, response.getResult());
+            } else {
+                switch (response.getErrorType()) {
+                    case Response.UNKNOWN_HOST_EXCEPTION_ERROR:
+                        callback.onUnknownHost(key, url, response.getErrorMessage());
+                        break;
+                    case Response.SOCKET_TIMEOUT_EXCEPTION_ERROR:
+                        callback.onTimeout(key, url, response.getErrorMessage());
+                        break;
+                    case Response.SOCKET_EXCEPTION_ERROR:
+                    case Response.IO_EXCEPTION_ERROR:
+                        callback.onDisconnected(key, url, response.getErrorMessage());
+                        break;
+                    default:
+                        callback.onFail(key, url, response, response.getErrorType(), response.getErrorMessage());
+                        break;
+                }
+            }
+        }
+    }
+
+    @Deprecated
+    protected abstract String createURLString(final URLInfo urlInfo);
+
+    protected abstract Response getResponse(String urlStr, String method, List<HeaderField> rqProperties, List<QueryAttribute> rqParams, String body);
+
 }

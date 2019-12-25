@@ -1,12 +1,12 @@
 package com.jasonstudio.jy.androidlib.http.response;
 
 public class Response {
-	
+	@Deprecated
 	public static final int INVALID_COOKIE_ERROR = 1;
     public static final int IO_EXCEPTION_ERROR = 2;
     public static final int SOCKET_EXCEPTION_ERROR = 3;
     public static final int SOCKET_TIMEOUT_EXCEPTION_ERROR = 4;
-    public static final int OTHERS_ERROR = 5;
+    public static final int UNKNOWN_HOST_EXCEPTION_ERROR = 5;
 
     private boolean isError;
     private int errorType;   // 1為Cookie失效

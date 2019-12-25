@@ -13,6 +13,12 @@
             expires="5000"
             method="GET" />
 
+        <api
+            key="GET-USER_INFO"
+            path="dummy_path"
+            expires="5000"
+            method="GET" />
+
     </apis>
 
 </service>

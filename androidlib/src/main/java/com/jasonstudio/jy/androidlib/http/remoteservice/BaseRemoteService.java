@@ -4,13 +4,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.List;
+import java.util.Map;
 
 import com.jasonstudio.jy.androidlib.http.request.HeaderField;
 import com.jasonstudio.jy.androidlib.http.request.HttpRequest;
 import com.jasonstudio.jy.androidlib.http.request.HttpsRequest;
 import com.jasonstudio.jy.androidlib.http.request.QueryAttribute;
 import com.jasonstudio.jy.androidlib.http.request.Request;
-import com.jasonstudio.jy.androidlib.http.request.RequestCallback;
 import com.jasonstudio.jy.androidlib.http.request.RequestManager;
 import com.jasonstudio.jy.androidlib.http.response.Response;
 import com.jasonstudio.jy.androidlib.http.url.URLConfigManager;
@@ -26,7 +26,7 @@ public abstract class BaseRemoteService
 
     protected ServiceDataReceiver dataListener;
 
-    public void registerDataReceiver(ServiceDataReceiver dataListener) {
+    public void registerDataReceiver(@NonNull ServiceDataReceiver dataListener) {
         this.dataListener = dataListener;
     }
 
@@ -40,23 +40,23 @@ public abstract class BaseRemoteService
     @NonNull
     protected abstract URLConfigManager injectURLConfigManager();
 
-    @Nullable
+
     protected abstract String interceptURLString(String url);
 
 
-    protected void invoke(final String key,
-                          List<HeaderField> headers,
-                          List<QueryAttribute> queries,
-                          final String requestBody) {
-        invoke(key, headers, queries, requestBody, this);
-    }
-
-    @Override
     public void invoke(@NonNull final String key,
                        @Nullable List<HeaderField> headers,
                        @Nullable List<QueryAttribute> queries,
-                       @Nullable final String requestBody,
-                       @NonNull RequestCallback callback) {
+                       @Nullable final String requestBody) {
+
+        invoke(key, null, headers, queries, requestBody);
+    }
+
+    public void invoke(@NonNull final String key,
+                       @Nullable Map<String, String> pathVars,
+                       @Nullable List<HeaderField> headers,
+                       @Nullable List<QueryAttribute> queries,
+                       @Nullable final String requestBody) {
 
         final URLInfo urlInfo = getURLConfigManager().findURL(key);
 
@@ -64,17 +64,17 @@ public abstract class BaseRemoteService
         if (interceptURLString(url) != null) {
             url = interceptURLString(url);
         }
+
+        if (pathVars != null) {
+            url = embedPathVars(url, pathVars);
+        }
+
         if (queries != null) {
             url = addRequestParameter(url, queries);
         }
 
-        invoke(key, urlInfo.getMethod(), url, headers, requestBody, callback);
-    }
+        invoke(key, urlInfo.getMethod(), url, headers, requestBody);
 
-    public void cancelRequst() {
-        if (getRequestManager() != null) {
-            getRequestManager().cancelRequests();
-        }
     }
 
     @Override
@@ -82,8 +82,7 @@ public abstract class BaseRemoteService
                        @NonNull String method,
                        @NonNull String url,
                        @Nullable List<HeaderField> headers,
-                       @Nullable String requestBody,
-                       @NonNull RequestCallback callback) {
+                       @Nullable String requestBody) {
 
         Request request;
         if (url.startsWith("https")) {
@@ -96,24 +95,41 @@ public abstract class BaseRemoteService
         request.setRqProperties(headers);
         request.setRqParams(null);
         request.setBody(requestBody);
-        request.setCallback(callback);
+        request.setCallback(this);
 
         getRequestManager().start();
         getRequestManager().execute(request);
     }
 
-    private String generateDefaultURLString(URLInfo urlInfo) {
-        StringBuilder builder = new StringBuilder();
-        if (urlInfo == null) {
-            System.out.println("urlInfo == null");
+    public void cancelRequst() {
+        if (getRequestManager() != null) {
+            getRequestManager().cancelRequests();
         }
+    }
+
+    @NonNull
+    private String generateDefaultURLString(@NonNull URLInfo urlInfo) {
+        StringBuilder builder = new StringBuilder();
         builder.append(urlInfo.getScheme());
         builder.append(urlInfo.getHost());
         builder.append(urlInfo.getPath());
         return builder.toString();
     }
 
-    private String addRequestParameter(@Nullable String urlStr, @NonNull List<QueryAttribute> rqParams) {
+    private String embedPathVars(@NonNull String url, @NonNull Map<String, String> pathVars) {
+        if(pathVars.isEmpty()) {
+            return url;
+        }
+        for (String pathKey: pathVars.keySet()) {
+            String pathValue = pathVars.get(pathKey);
+            if(pathValue != null) {
+                url = url.replace(pathKey, pathValue);
+            }
+        }
+        return url;
+    }
+
+    private String addRequestParameter(@NonNull String urlStr, @NonNull List<QueryAttribute> rqParams) {
         StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append(urlStr);
         if (!rqParams.isEmpty()) {
@@ -145,14 +161,35 @@ public abstract class BaseRemoteService
         }
     }
 
-    public RequestManager getRequestManager() {
+    @Override
+    public void onUnknownHost(String key, String url, String errorMessage) {
+        if (dataListener != null){
+            dataListener.onUnknownHost(key, errorMessage);
+        }
+    }
+
+    @Override
+    public void onDisconnected(String key, String url, String errorMessage) {
+        if (dataListener != null){
+            dataListener.onDisconnected(key, errorMessage);
+        }
+    }
+
+    @Override
+    public void onTimeout(String key, String url, String errorMessage) {
+        if (dataListener != null){
+            dataListener.onTimeout(key, errorMessage);
+        }
+    }
+
+    public synchronized RequestManager getRequestManager() {
         if (mRequestManager == null) {
             mRequestManager = injectRequestManager();
         }
         return mRequestManager;
     }
 
-    public URLConfigManager getURLConfigManager() {
+    public synchronized URLConfigManager getURLConfigManager() {
         if (mURLConfigManager == null) {
             mURLConfigManager = injectURLConfigManager();
         }

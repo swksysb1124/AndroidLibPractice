@@ -8,7 +8,7 @@ import android.os.Looper;
 import com.jasonstudio.jy.androidlib.http.remoteservice.ServiceDataReceiver;
 import com.jasonstudio.jy.androidlib.mvp.IBasePresenter;
 import com.jasonstudio.jy.androidlibpractice.controller.MainActivity;
-import com.jasonstudio.jy.androidlibpractice.service.RemoteServiceImp;
+import com.jasonstudio.jy.androidlibpractice.service.HttpBinApiService;
 import com.jasonstudio.jy.androidlibpractice.view.MainViewI;
 import com.jasonstudio.jy.androidlibpractice.view.SubViewI;
 
@@ -21,7 +21,7 @@ public class MainPresenterI
 
     private MainActivity mActivity;
 
-    private RemoteServiceImp mRemoteServiceImp;
+    private HttpBinApiService mRemoteServiceImp;
 
     private MainViewI mMainView;
 
@@ -47,7 +47,7 @@ public class MainPresenterI
 
     @Override
     public void start() {
-        mRemoteServiceImp = RemoteServiceImp.getInstance(mContext.getApplicationContext());
+        mRemoteServiceImp = HttpBinApiService.getInstance(mContext.getApplicationContext());
         mRemoteServiceImp.registerDataReceiver(new ServiceDataReceiver() {
             @Override
             public void onSuccess(final String key, final String content) {
@@ -69,6 +69,21 @@ public class MainPresenterI
                         updateErrorReceivedToUi(key, errorType, errorMessage);
                     }
                 });
+            }
+
+            @Override
+            public void onDisconnected(String key, String errorMessage) {
+
+            }
+
+            @Override
+            public void onTimeout(String key, String errorMessage) {
+
+            }
+
+            @Override
+            public void onUnknownHost(String key, String errorMessage) {
+
             }
         });
     }

@@ -11,30 +11,29 @@ import com.jasonstudio.jy.androidlib.http.request.QueryAttribute;
 import com.jasonstudio.jy.androidlib.http.request.RequestManager;
 import com.jasonstudio.jy.androidlib.http.request.ThreadRequestManager;
 import com.jasonstudio.jy.androidlib.http.url.URLConfigManager;
-import com.jasonstudio.jy.androidlib.http.url.URLInfo;
 import com.jasonstudio.jy.androidlib.http.url.XmlURLConfigManager;
 
 /**
  * Created by weikai on 2018/12/21.
  */
 
-public class RemoteServiceImp
+public class HttpBinApiService
         extends BaseRemoteService
         implements WebServiceAPI {
 
     private Context mContext;
 
-    private RemoteServiceImp(Context context) {
+    private HttpBinApiService(Context context) {
         mContext = context;
     }
 
-    private static RemoteServiceImp instance;
+    private static HttpBinApiService instance;
 
-    public static RemoteServiceImp getInstance(final Context context) {
+    public static HttpBinApiService getInstance(final Context context) {
         if(instance == null) {
-            synchronized (RemoteServiceImp.class) {
+            synchronized (HttpBinApiService.class) {
                 if(instance == null) {
-                    instance = new RemoteServiceImp(context);
+                    instance = new HttpBinApiService(context);
                 }
             }
         }
@@ -49,7 +48,7 @@ public class RemoteServiceImp
 
     @Override
     protected URLConfigManager injectURLConfigManager() {
-        return new XmlURLConfigManager(mContext, "url.xml");
+        return new XmlURLConfigManager(mContext, "httpbin_api_url.xml");
     }
 
     @Override

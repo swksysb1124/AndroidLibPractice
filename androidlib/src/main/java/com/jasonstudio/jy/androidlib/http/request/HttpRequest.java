@@ -9,6 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 
@@ -31,10 +32,13 @@ public class HttpRequest extends Request{
 	@Override
 	protected Response getResponse(String urlStr, String method, List<HeaderField> rqProperties,
 								   List<QueryAttribute> rqParams, String body) {
+
 		HttpURLConnection connection = null;
+
 		if(method == null) {
 			method = "GET";
 		}
+
 	    if(method.equals("GET")){
 	    	urlStr = addRequestParameter(urlStr, rqParams);
 	    }
@@ -51,7 +55,7 @@ public class HttpRequest extends Request{
 	        setTimeout(connection);
 	        
 	        if(method.equals("POST") || method.equals("PUT")){
-	        	connection.setDoOutput(true); // 由 connecction 輸出
+	        	connection.setDoOutput(true);
 	        	writeBodyToConnection(getBody(), connection);
 	        }
 	        
@@ -76,6 +80,9 @@ public class HttpRequest extends Request{
 	    }catch (SocketException se) {
 	        setErrorResponse(Response.SOCKET_EXCEPTION_ERROR, 
 	        		se.toString(), response);
+	    }catch (UnknownHostException ue) {
+			setErrorResponse(Response.UNKNOWN_HOST_EXCEPTION_ERROR,
+					ue.toString(), response);
 	    }catch (IOException e) {
 	        setErrorResponse(Response.IO_EXCEPTION_ERROR, 
 	        		e.toString(), response);
@@ -122,7 +129,8 @@ public class HttpRequest extends Request{
 			connection.setRequestProperty(property.key, property.value);
 		}
 	}
-	
+
+	@Deprecated
 	private String addRequestParameter(String urlStr, List<QueryAttribute> rqParams) {
 		StringBuilder urlBuilder = new StringBuilder();
 		urlBuilder.append(urlStr);
@@ -150,7 +158,7 @@ public class HttpRequest extends Request{
 		if(inputStream == null) {
 			return null;
 		}
-	    byte[] buffer = new byte[2048];
+		byte[] buffer = new byte[2048];
 	    ByteArrayOutputStream out = new ByteArrayOutputStream();
 	    int length;
 	    while ((length = inputStream.read(buffer)) != -1) {
@@ -167,7 +175,7 @@ public class HttpRequest extends Request{
 	    response.setErrorMessage("");
 	    response.setResult(result);
 	}
-	
+
 	private void setErrorResponse(int type, String message, final Response response) {
 	    response.setError(true);
 	    response.setErrorType(type);

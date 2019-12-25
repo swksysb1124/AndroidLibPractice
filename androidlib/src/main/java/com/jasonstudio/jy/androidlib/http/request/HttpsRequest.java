@@ -9,6 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -43,22 +44,20 @@ public class HttpsRequest extends Request{
 	@Override
 	protected Response getResponse(String urlStr, String method, List<HeaderField> rqProperties,
 								   List<QueryAttribute> rqParams, String body) {
-		
+
 		HttpsURLConnection connection = null;
-		
+
 		if(method == null) {
 			method = "GET";
 		}
-		
+
 	    if(method.equals("GET")){
 	    	urlStr = addRequestParameter(urlStr, rqParams);
 	    }
 	    
 	    Response response = new Response();
 	    try {
-	        
 	        URL url= new URL(null, urlStr);
-	        
 	        connection = (HttpsURLConnection) url.openConnection();
 //	        setCertificate(connection);
 	        
@@ -69,7 +68,7 @@ public class HttpsRequest extends Request{
 	        setTimeout(connection);
 	        
 	        if(method.equals("POST") || method.equals("PUT")){
-	        	connection.setDoOutput(true); // 由 connecction 輸出
+	        	connection.setDoOutput(true);
 	        	writeBodyToConnection(getBody(), connection);
 	        }
 	        
@@ -94,6 +93,9 @@ public class HttpsRequest extends Request{
 	    }catch (SocketException se) {
 	        setErrorResponse(Response.SOCKET_EXCEPTION_ERROR, 
 	        		se.toString(), response);
+	    }catch (UnknownHostException ue) {
+			setErrorResponse(Response.UNKNOWN_HOST_EXCEPTION_ERROR,
+					ue.toString(), response);
 	    }catch (IOException e) {
 	        setErrorResponse(Response.IO_EXCEPTION_ERROR, 
 	        		e.toString(), response);
@@ -130,7 +132,7 @@ public class HttpsRequest extends Request{
         dos.flush();
         dos.close(); 
     }
-	
+
 	private void addRequestProperty(final HttpURLConnection connection, List<HeaderField> rqProperties) {
 		if(rqProperties == null || rqProperties.isEmpty()) {
 			return;
@@ -140,7 +142,8 @@ public class HttpsRequest extends Request{
 			connection.setRequestProperty(property.key, property.value);
 		}
 	}
-	
+
+	@Deprecated
 	private String addRequestParameter(String urlStr, List<QueryAttribute> rqParams) {
 		StringBuilder urlBuilder = new StringBuilder();
 		urlBuilder.append(urlStr);
@@ -165,7 +168,10 @@ public class HttpsRequest extends Request{
 	}
 	
 	private String getResponseBody(InputStream inputStream) throws IOException {
-	    byte[] buffer = new byte[2048];
+		if(inputStream == null) {
+			return null;
+		}
+		byte[] buffer = new byte[2048];
 	    ByteArrayOutputStream out = new ByteArrayOutputStream();
 	    int length;
 	    while ((length = inputStream.read(buffer)) != -1) {

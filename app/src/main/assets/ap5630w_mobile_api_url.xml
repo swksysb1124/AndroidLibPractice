@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service
+    name="AP5630W RESTful API">
+
+    <servers>
+        <server
+            env="dev"
+            scheme="http://"
+            host="cap.askey.com"
+            port="4422"  />
+    </servers>
+
+    <apis>
+
+        <api
+            key="GET-LOGIN"
+            expires="300"
+            method="PUT"
+            path="/api/login" />
+
+        <api
+            key="GET-LOGOUT"
+            expires="300"
+            method="GET"
+            path="/api/logout/{SESSION_TOKEN}" />
+
+        <api
+            key="PUT-ACCOUNT_PWD"
+            expires="300"
+            method="PUT"
+            path="/api/account_pwd/{SESSION_TOKEN}" />
+
+        <api
+            key="PUT-WIFI_BASIC"
+            expires="300"
+            method="PUT"
+            path="/api/wifi_basic/{SESSION_TOKEN}" />
+
+        <api
+            key="GET-WIFI_BASIC_RELOAD"
+            expires="300"
+            method="GET"
+            path="/api/wifi_basic_reload/{SESSION_TOKEN}" />
+
+        <api
+            key="GET-WIFI_BASIC_RELOAD_WLAN"
+            expires="300"
+            method="GET"
+            path="/api/wifi_basic_reload_wlan/{SESSION_TOKEN}" />
+
+        <api
+            key="GET-ENCRY_OPTIONS"
+            expires="300"
+            method="GET"
+            path="/api/encry_options/{SESSION_TOKEN}" />
+
+        <api
+            key="GET-ONBOARD_STATUS"
+            expires="300"
+            method="GET"
+            path="/api/onboard_status" />
+
+        <api
+            key="PUT-ONBOARD_STATUS"
+            expires="300"
+            method="PUT"
+            path="/api/onboard_status/{SESSION_TOKEN}" />
+
+        <api
+            key="GET-REBOOT"
+            expires="300"
+            method="GET"
+            path="/api/reboot/{SESSION_TOKEN}" />
+
+        <api
+            key="GET-GLOBAL_DATA"
+            expires="300"
+            method="GET"
+            path="/api/global_data/{SESSION_TOKEN}" />
+
+        <api
+            key="PUT-GLOBAL_DATA-MESH_MODE"
+            expires="300"
+            method="GET"
+            path="/api/global_data/mesh_mode/{SESSION_TOKEN}" />
+
+        <api
+            key="GET-CURRENT_DATA"
+            expires="300"
+            method="GET"
+            path="/api/current_data/{SESSION_TOKEN}" />
+
+        <api
+            key="GET-CURRENT_DATA-WIFI"
+            expires="300"
+            method="GET"
+            path="/api/current_data/wifi/{SESSION_TOKEN}" />
+
+        <api
+            key="GET-CURRENT_DATA-SYSTEM"
+            expires="300"
+            method="GET"
+            path="/api/current_data/system/{SESSION_TOKEN}" />
+
+        <api
+            key="GET-CURRENT_DATA-NETWORK_STATUS"
+            expires="300"
+            method="GET"
+            path="/api/current_data/network_status/{SESSION_TOKEN}" />
+
+        <api
+            key="GET-TABLE_DATA-DEVICE_COUNT"
+            expires="300"
+            method="GET"
+            path="/api/table_data/device_count/{SESSION_TOKEN}" />
+
+
+        <api
+            key="GET-TABLE_DATA-CLIENT_LIST"
+            expires="300"
+            method="GET"
+            path="/api/table_data/client_list/{SESSION_TOKEN}" />
+
+        <api
+            key="PUT-TABLE_DATA-CLIENT_LIST"
+            expires="300"
+            method="PUT"
+            path="/api/table_data/client_list/{SESSION_TOKEN}" />
+
+        <api
+            key="GET-TABLE_DATA-ENTRY_NODE"
+            expires="300"
+            method="GET"
+            path="/api/table_data/entry_node/{SESSION_TOKEN}" />
+
+        <api
+            key="PUT-TABLE_DATA-TARGET_CLIENT_INFO"
+            expires="300"
+            method="PUT"
+            path="/api/table_data/target_client_info/{SESSION_TOKEN}" />
+
+        <api
+            key="GET-TABLE_DATA-MESH_LIST"
+            expires="300"
+            method="GET"
+            path="/api/table_data/mesh_list/{SESSION_TOKEN}" />
+
+        <api
+            key="PUT-TABLE_DATA-TARGET_MESH_INFO"
+            expires="300"
+            method="PUT"
+            path="/api/table_data/target_mesh_info/{SESSION_TOKEN}" />
+
+
+    </apis>
+
+</service>
