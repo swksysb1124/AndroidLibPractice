@@ -3,6 +3,7 @@ package com.jasonstudio.jy.androidlibpractice;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -69,6 +70,7 @@ public class TestActivity extends AppCompatActivity {
 
         setupServices();
         setupInputListener();
+        setupViews();
     }
 
     @Override
@@ -111,6 +113,11 @@ public class TestActivity extends AppCompatActivity {
         });
     }
 
+    private void setupViews() {
+        TextView txtResult = findViewById(R.id.txtResult);
+        txtResult.setMovementMethod(ScrollingMovementMethod.getInstance());
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -135,6 +142,7 @@ public class TestActivity extends AppCompatActivity {
                     txtResult.setTextColor(Color.parseColor("#AAAA00"));
                 }
                 txtResult.setText(result);
+                txtResult.scrollTo(0,0);
             }
         });
     }
@@ -146,6 +154,7 @@ public class TestActivity extends AppCompatActivity {
                 TextView txtResult = findViewById(R.id.txtResult);
                 txtResult.setTextColor(Color.parseColor("#AA0000"));
                 txtResult.setText(error);
+                txtResult.scrollTo(0,0);
             }
         });
     }
