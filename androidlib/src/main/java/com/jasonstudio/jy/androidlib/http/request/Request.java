@@ -3,8 +3,6 @@ package com.jasonstudio.jy.androidlib.http.request;
 import java.util.List;
 
 import com.jasonstudio.jy.androidlib.http.response.Response;
-import com.jasonstudio.jy.androidlib.http.url.URLInfo;
-
 
 public abstract class Request
         implements Runnable {
@@ -117,9 +115,11 @@ public abstract class Request
         }
     }
 
-    @Deprecated
-    protected abstract String createURLString(final URLInfo urlInfo);
-
-    protected abstract Response getResponse(String urlStr, String method, List<HeaderField> rqProperties, List<QueryAttribute> rqParams, String body, int timeout);
+    protected abstract Response getResponse(String urlStr,
+                                            String method,
+                                            List<HeaderField> rqProperties,
+                                            List<QueryAttribute> rqParams,
+                                            String body,
+                                            int timeout);
 
 }

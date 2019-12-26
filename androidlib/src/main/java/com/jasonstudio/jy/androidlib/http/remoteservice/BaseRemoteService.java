@@ -8,7 +8,6 @@ import java.util.Map;
 
 import com.jasonstudio.jy.androidlib.http.request.HeaderField;
 import com.jasonstudio.jy.androidlib.http.request.HttpRequest;
-import com.jasonstudio.jy.androidlib.http.request.HttpsRequest;
 import com.jasonstudio.jy.androidlib.http.request.QueryAttribute;
 import com.jasonstudio.jy.androidlib.http.request.Request;
 import com.jasonstudio.jy.androidlib.http.request.RequestManager;
@@ -93,12 +92,8 @@ public abstract class BaseRemoteService
                        @Nullable List<HeaderField> headers,
                        @Nullable String requestBody, int timeout) {
 
-        Request request;
-        if (url.startsWith("https")) {
-            request = new HttpsRequest(url);
-        } else {
-            request = new HttpRequest(url);
-        }
+        Request request = new HttpRequest(url);
+
         request.setKey(key);
         request.setTimeout(timeout);
         request.setMethod(method);
