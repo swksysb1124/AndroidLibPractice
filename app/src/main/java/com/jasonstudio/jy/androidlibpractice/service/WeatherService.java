@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 import com.jasonstudio.jy.androidlib.http.cache.CacheRemoteService;
 import com.jasonstudio.jy.androidlib.http.cache.CacheData;
 import com.jasonstudio.jy.androidlib.http.cache.CacheManager;
-import com.jasonstudio.jy.androidlib.http.cache.CacheManagerImp;
+import com.jasonstudio.jy.androidlib.http.cache.SimpleCacheManager;
 import com.jasonstudio.jy.androidlib.http.request.ExecutorRequestManager;
 import com.jasonstudio.jy.androidlib.http.request.RequestManager;
 import com.jasonstudio.jy.androidlib.http.url.URLConfigManager;
@@ -23,7 +23,7 @@ public class WeatherService extends CacheRemoteService {
     @Nullable
     @Override
     protected CacheManager<CacheData> injectCacheManager() {
-        return CacheManagerImp.getInstance(context);
+        return SimpleCacheManager.getInstance(context);
     }
 
     @Override

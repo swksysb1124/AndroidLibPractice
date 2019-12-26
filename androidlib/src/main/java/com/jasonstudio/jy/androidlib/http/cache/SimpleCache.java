@@ -6,52 +6,49 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import java.lang.ref.WeakReference;
-
-public class CacheManagerImp implements CacheManager<CacheData> {
+public class SimpleCache implements CacheManager.Cache<CacheData> {
 
     private static final String SP_CACHE_API_DATA = "sp.cache.api.data";
-    private WeakReference<Context> mContext;
+    private SharedPreferences mPreference;
 
-    private CacheManagerImp(Context context) {
-        setContext(context);
+    public SimpleCache(Context mContext) {
+        mPreference = mContext.getSharedPreferences(SP_CACHE_API_DATA, Context.MODE_PRIVATE);
     }
 
-    private void setContext(Context context) {
-        mContext = new WeakReference<>(context);
-    }
-
-    private static CacheManagerImp INSTANCE;
-
-    public static CacheManagerImp getInstance(Context context) {
-        if (INSTANCE == null) {
-            synchronized (CacheManagerImp.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new CacheManagerImp(context);
-                }
-            }
-        }
-        if (INSTANCE.mContext.get() != context) {
-            INSTANCE.setContext(context);
-        }
-        return INSTANCE;
+    public static SimpleCache newInstance(Context mContext) {
+        return new SimpleCache(mContext);
     }
 
     @Nullable
     @Override
     public CacheData getData(@NonNull String url) {
-        SharedPreferences preferences = mContext.get()
-                .getSharedPreferences(SP_CACHE_API_DATA, Context.MODE_PRIVATE);
-        String rowData = preferences.getString(url, null);
+        String rowData = mPreference.getString(url, null);
         return deserializeCacheData(rowData);
     }
 
     @Override
     public void putData(@NonNull String url, @NonNull CacheData data) {
-        SharedPreferences preferences = mContext.get()
-                .getSharedPreferences(SP_CACHE_API_DATA, Context.MODE_PRIVATE);
-        preferences.edit().putString(url, serializeCacheData(data))
-                .apply();
+
+        String serializedData = serializeCacheData(data);
+
+        if(getMaxCount() == 0) return;
+
+        if (mPreference.getAll().size() < getMaxCount()) {
+            mPreference.edit()
+                    .putString(url, serializedData)
+                    .apply();
+        } else {
+            String key = mPreference.getAll().keySet().iterator().next();
+            mPreference.edit()
+                    .remove(key)
+                    .putString(url, serializedData)
+                    .apply();
+        }
+    }
+
+    @Override
+    public int getMaxCount() {
+        return 1;
     }
 
     private String serializeCacheData(CacheData data) {
@@ -64,7 +61,7 @@ public class CacheManagerImp implements CacheManager<CacheData> {
     }
 
     private CacheData deserializeCacheData(String rowData) {
-        Log.w("CacheManagerImp", "deserialize: rowDate=" + rowData);
+        Log.w("SimpleCacheManager", "deserialize: rowDate=" + rowData);
         if (rowData == null) {
             return null;
         }
