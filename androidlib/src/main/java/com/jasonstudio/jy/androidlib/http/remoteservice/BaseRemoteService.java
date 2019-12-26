@@ -84,6 +84,15 @@ public abstract class BaseRemoteService
                        @Nullable List<HeaderField> headers,
                        @Nullable String requestBody) {
 
+        invoke(key, method, url, headers, requestBody, 30000);
+    }
+
+    private void invoke(@NonNull String key,
+                       @NonNull String method,
+                       @NonNull String url,
+                       @Nullable List<HeaderField> headers,
+                       @Nullable String requestBody, int timeout) {
+
         Request request;
         if (url.startsWith("https")) {
             request = new HttpsRequest(url);
@@ -91,6 +100,7 @@ public abstract class BaseRemoteService
             request = new HttpRequest(url);
         }
         request.setKey(key);
+        request.setTimeout(timeout);
         request.setMethod(method);
         request.setRqProperties(headers);
         request.setRqParams(null);

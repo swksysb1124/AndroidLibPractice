@@ -16,6 +16,7 @@ public abstract class Request
     private List<QueryAttribute> rqParams;
     private String body;
     private RequestCallback callback;
+    private int timeout = 30000;
 
     public Request(String url) {
         this.url = url;
@@ -61,6 +62,13 @@ public abstract class Request
         this.callback = callback;
     }
 
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
 
     public String getKey() {
         return key;
@@ -85,7 +93,7 @@ public abstract class Request
 
     @Override
     public void run() {
-        Response response = getResponse(url, method, rqProperties, rqParams, body);
+        Response response = getResponse(url, method, rqProperties, rqParams, body, timeout);
         if (callback != null) {
             if (!response.hasError()) {
                 callback.onSuccess(key, url, response, response.getResult());
@@ -112,6 +120,6 @@ public abstract class Request
     @Deprecated
     protected abstract String createURLString(final URLInfo urlInfo);
 
-    protected abstract Response getResponse(String urlStr, String method, List<HeaderField> rqProperties, List<QueryAttribute> rqParams, String body);
+    protected abstract Response getResponse(String urlStr, String method, List<HeaderField> rqProperties, List<QueryAttribute> rqParams, String body, int timeout);
 
 }

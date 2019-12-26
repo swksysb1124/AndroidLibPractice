@@ -43,7 +43,7 @@ public class HttpsRequest extends Request{
 
 	@Override
 	protected Response getResponse(String urlStr, String method, List<HeaderField> rqProperties,
-								   List<QueryAttribute> rqParams, String body) {
+								   List<QueryAttribute> rqParams, String body, int timeout) {
 
 		HttpsURLConnection connection = null;
 
@@ -65,7 +65,7 @@ public class HttpsRequest extends Request{
 	        
 	        addRequestProperty(connection, rqProperties);
 	        
-	        setTimeout(connection);
+	        setTimeout(connection, timeout);
 	        
 	        if(method.equals("POST") || method.equals("PUT")){
 	        	connection.setDoOutput(true);
@@ -162,9 +162,9 @@ public class HttpsRequest extends Request{
 		return urlBuilder.toString();
 	}
 	
-	private void setTimeout(final HttpURLConnection connection) {
-	    connection.setConnectTimeout(30000);
-	    connection.setReadTimeout(30000);
+	private void setTimeout(final HttpURLConnection connection, int timeout) {
+	    connection.setConnectTimeout(timeout);
+	    connection.setReadTimeout(timeout);
 	}
 	
 	private String getResponseBody(InputStream inputStream) throws IOException {
