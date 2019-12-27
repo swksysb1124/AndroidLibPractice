@@ -1,5 +1,6 @@
 package com.jasonstudio.jy.androidlib.http.request;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.io.ByteArrayOutputStream;
@@ -12,12 +13,12 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import com.jasonstudio.jy.androidlib.http.response.Response;
-import com.jasonstudio.jy.androidlib.http.url.URLInfo;
-import com.jasonstudio.jy.androidlib.http.util.DefaultURLStringUtil;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -31,22 +32,28 @@ public class HttpRequest extends Request {
         super(url);
     }
 
+    private HttpRequest(Builder builder) {
+        super(builder.url);
+        setKey(builder.key);
+        setMethod(builder.method);
+        setHeaderFields(builder.rqProperties);
+        setBody(builder.body);
+        setCallback(builder.callback);
+        setTimeout(builder.timeout);
+        setCertificate(builder.certificate);
+    }
+
     private void setCertificate(@Nullable HttpsCertificate certificate) {
         this.certificate = certificate;
     }
 
     @Override
-    protected Response getResponse(String urlStr, String method, List<HeaderField> rqProperties,
-                                   List<QueryAttribute> rqParams, String body, int timeout) {
+    protected Response getResponse(String urlStr, String method, List<HeaderField> rqProperties, String body, int timeout) {
 
         HttpURLConnection connection = null;
 
         if (method == null) {
             method = "GET";
-        }
-
-        if (method.equals("GET")) {
-            urlStr = addRequestParameter(urlStr, rqParams);
         }
 
         Response response = new Response();
@@ -55,7 +62,7 @@ public class HttpRequest extends Request {
 
             if (urlStr.startsWith("https://")) {
                 connection = (HttpsURLConnection) url.openConnection();
-                if(certificate != null) {
+                if (certificate != null) {
                     certificate.setCertificate((HttpsURLConnection) connection);
                 }
             } else {
@@ -77,8 +84,9 @@ public class HttpRequest extends Request {
             response.setStatusCode(statusCode);
 
             if (statusCode == HttpURLConnection.HTTP_OK) {
-                String cookie = extractSetCookie(connection);
-                response.setCookie(cookie);
+                List<HeaderField> headerFields = extractHeaders(connection);
+                response.setHeaders(headerFields);
+
                 InputStream inputStream = connection.getInputStream();
                 String result = getResponseBody(inputStream);
                 setSuccessResponse(result, response);
@@ -108,28 +116,29 @@ public class HttpRequest extends Request {
         return response;
     }
 
-    private String extractSetCookie(HttpURLConnection connection) {
-        String firstCookie = "";
+
+    private List<HeaderField> extractHeaders(@NonNull HttpURLConnection connection) {
+        List<HeaderField> headerFields = new ArrayList<>();
         Map<String, List<String>> map = connection.getHeaderFields();
         for (String key : map.keySet()) {
             if (key == null) continue;
-            if (key.equals("Set-Cookie")) {
-                List<String> list = map.get(key);
+            List<String> list = map.get(key);
+            if (list != null) {
                 StringBuilder builder = new StringBuilder();
                 for (String str : list) {
-                    builder.append(str);
+                    builder.append(str).append(";");
                 }
-                firstCookie = builder.toString();
-                System.out.println("第一次得到的cookie: " + firstCookie);
+                String header = builder.toString();
+                headerFields.add(new HeaderField(key, header));
             }
         }
-        return firstCookie;
+        return headerFields;
     }
 
-    private void writeBodyToConnection(final String requestBody, final HttpURLConnection connection)
-            throws UnsupportedEncodingException, IOException {
+    private void writeBodyToConnection(@NonNull final String requestBody, @NonNull final HttpURLConnection connection)
+            throws IOException {
         DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
-        dos.write(requestBody.getBytes("UTF-8"));
+        dos.write(requestBody.getBytes(StandardCharsets.UTF_8));
         dos.flush();
         dos.close();
     }
@@ -142,25 +151,6 @@ public class HttpRequest extends Request {
         for (HeaderField property : rqProperties) {
             connection.setRequestProperty(property.key, property.value);
         }
-    }
-
-    @Deprecated
-    private String addRequestParameter(String urlStr, List<QueryAttribute> rqParams) {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append(urlStr);
-        if (rqParams != null && !rqParams.isEmpty()) {
-            urlBuilder.append("?");
-            for (int i = 0; i < rqParams.size(); i++) {
-                QueryAttribute param = rqParams.get(i);
-                urlBuilder.append(param.key);
-                urlBuilder.append("=");
-                urlBuilder.append(param.value);
-                if (i != rqParams.size() - 1) {
-                    urlBuilder.append("&");
-                }
-            }
-        }
-        return urlBuilder.toString();
     }
 
     private void setTimeout(final HttpURLConnection connection, int timeout) {
@@ -195,5 +185,52 @@ public class HttpRequest extends Request {
         response.setErrorType(type);
         response.setErrorMessage(message);
         response.setResult("");
+    }
+
+
+    public static final class Builder {
+        private String key;
+        private String url;
+        private String method;
+        private List<HeaderField> rqProperties;
+        private String body;
+        private Request.Callback callback;
+        private int timeout;
+        private HttpsCertificate certificate;
+
+        public Builder(String key, String url, String method) {
+            this.key = key;
+            this.url = url;
+            this.method = method;
+        }
+
+        public Builder setRqProperties(List<HeaderField> rqProperties) {
+            this.rqProperties = rqProperties;
+            return this;
+        }
+
+        public Builder setBody(String body) {
+            this.body = body;
+            return this;
+        }
+
+        public Builder setCallback(Request.Callback callback) {
+            this.callback = callback;
+            return this;
+        }
+
+        public Builder setTimeout(int timeout) {
+            this.timeout = timeout;
+            return this;
+        }
+
+        public Builder setCertificate(HttpsCertificate certificate) {
+            this.certificate = certificate;
+            return this;
+        }
+
+        public HttpRequest build() {
+            return new HttpRequest(this);
+        }
     }
 }

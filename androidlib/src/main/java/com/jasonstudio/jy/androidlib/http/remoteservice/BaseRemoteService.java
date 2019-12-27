@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.jasonstudio.jy.androidlib.http.request.HeaderField;
 import com.jasonstudio.jy.androidlib.http.request.HttpRequest;
+import com.jasonstudio.jy.androidlib.http.request.HttpsCertificate;
 import com.jasonstudio.jy.androidlib.http.request.QueryAttribute;
 import com.jasonstudio.jy.androidlib.http.request.Request;
 import com.jasonstudio.jy.androidlib.http.request.RequestManager;
@@ -23,6 +24,9 @@ public abstract class BaseRemoteService
 
     private URLConfigManager mURLConfigManager;
 
+    @Nullable
+    private HttpsCertificate mCustomizedCertificate;
+
     protected ServiceDataReceiver dataListener;
 
     public void registerDataReceiver(@NonNull ServiceDataReceiver dataListener) {
@@ -31,6 +35,10 @@ public abstract class BaseRemoteService
 
     public void unregisterDataReceiver() {
         this.dataListener = null;
+    }
+
+    public void setCustomizedcCertificate(HttpsCertificate httpsCertificate) {
+        mCustomizedCertificate = httpsCertificate;
     }
 
     @NonNull
@@ -76,7 +84,7 @@ public abstract class BaseRemoteService
 
     }
 
-    @Override
+
     public void invoke(@NonNull String key,
                        @NonNull String method,
                        @NonNull String url,
@@ -86,21 +94,21 @@ public abstract class BaseRemoteService
         invoke(key, method, url, headers, requestBody, 30000);
     }
 
-    private void invoke(@NonNull String key,
-                       @NonNull String method,
-                       @NonNull String url,
-                       @Nullable List<HeaderField> headers,
-                       @Nullable String requestBody, int timeout) {
+    @Override
+    public void invoke(@NonNull String key,
+                        @NonNull String method,
+                        @NonNull String url,
+                        @Nullable List<HeaderField> headers,
+                        @Nullable String requestBody,
+                        int timeout) {
 
-        Request request = new HttpRequest(url);
-
-        request.setKey(key);
-        request.setTimeout(timeout);
-        request.setMethod(method);
-        request.setRqProperties(headers);
-        request.setRqParams(null);
-        request.setBody(requestBody);
-        request.setCallback(this);
+        Request request = new HttpRequest.Builder(key, url, method)
+                .setTimeout(timeout)
+                .setRqProperties(headers)
+                .setBody(requestBody)
+                .setCertificate(mCustomizedCertificate)
+                .setCallback(this)
+                .build();
 
         getRequestManager().start();
         getRequestManager().execute(request);
@@ -122,12 +130,12 @@ public abstract class BaseRemoteService
     }
 
     private String embedPathVars(@NonNull String url, @NonNull Map<String, String> pathVars) {
-        if(pathVars.isEmpty()) {
+        if (pathVars.isEmpty()) {
             return url;
         }
-        for (String pathKey: pathVars.keySet()) {
+        for (String pathKey : pathVars.keySet()) {
             String pathValue = pathVars.get(pathKey);
-            if(pathValue != null) {
+            if (pathValue != null) {
                 url = url.replace(pathKey, pathValue);
             }
         }
@@ -168,21 +176,21 @@ public abstract class BaseRemoteService
 
     @Override
     public void onUnknownHost(String key, String url, String errorMessage) {
-        if (dataListener != null){
+        if (dataListener != null) {
             dataListener.onUnknownHost(key, errorMessage);
         }
     }
 
     @Override
     public void onDisconnected(String key, String url, String errorMessage) {
-        if (dataListener != null){
+        if (dataListener != null) {
             dataListener.onDisconnected(key, errorMessage);
         }
     }
 
     @Override
     public void onTimeout(String key, String url, String errorMessage) {
-        if (dataListener != null){
+        if (dataListener != null) {
             dataListener.onTimeout(key, errorMessage);
         }
     }

@@ -10,10 +10,9 @@ public abstract class Request
     private String key;
     private String url;
     private String method;
-    private List<HeaderField> rqProperties;
-    private List<QueryAttribute> rqParams;
+    private List<HeaderField> headerFields;
     private String body;
-    private RequestCallback callback;
+    private Callback callback;
     private int timeout = 30000;
 
     public Request(String url) {
@@ -28,20 +27,12 @@ public abstract class Request
         this.method = method;
     }
 
-    public List<HeaderField> getRqProperties() {
-        return rqProperties;
+    public List<HeaderField> getHeaderFields() {
+        return headerFields;
     }
 
-    public void setRqProperties(List<HeaderField> rqProperties) {
-        this.rqProperties = rqProperties;
-    }
-
-    public List<QueryAttribute> getRqParams() {
-        return rqParams;
-    }
-
-    public void setRqParams(List<QueryAttribute> rqParams) {
-        this.rqParams = rqParams;
+    public void setHeaderFields(List<HeaderField> headerFields) {
+        this.headerFields = headerFields;
     }
 
     public String getBody() {
@@ -56,7 +47,7 @@ public abstract class Request
         return url;
     }
 
-    public void setCallback(RequestCallback callback) {
+    public void setCallback(Request.Callback callback) {
         this.callback = callback;
     }
 
@@ -85,13 +76,13 @@ public abstract class Request
     }
 
     @Deprecated
-    public RequestCallback getCallback() {
+    public Request.Callback getCallback() {
         return callback;
     }
 
     @Override
     public void run() {
-        Response response = getResponse(url, method, rqProperties, rqParams, body, timeout);
+        Response response = getResponse(url, method, headerFields, body, timeout);
         if (callback != null) {
             if (!response.hasError()) {
                 callback.onSuccess(key, url, response, response.getResult());
@@ -118,8 +109,14 @@ public abstract class Request
     protected abstract Response getResponse(String urlStr,
                                             String method,
                                             List<HeaderField> rqProperties,
-                                            List<QueryAttribute> rqParams,
                                             String body,
                                             int timeout);
 
+    public interface Callback {
+        void onSuccess(String key, String url, Response response, String content);
+        void onFail(String key, String url, Response response, int errorType, String errorMessage);
+        void onDisconnected(String key, String url, String errorMessage);
+        void onTimeout(String key, String url, String errorMessage);
+        void onUnknownHost(String key, String url, String errorMessage);
+    }
 }
