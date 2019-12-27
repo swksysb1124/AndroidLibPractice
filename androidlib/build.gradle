@@ -2,6 +2,8 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.novoda.bintray-release'
 
 ext {
+    RELEASE_VERSION = '1.0.0'
+    BUILD_NUMBER = 1
 
     ORGANIZATION = 'jasonstudio' // Organization in Bintray
     REPOSITORY = 'AndroidLibPractice' // Repository in given organization
@@ -11,10 +13,7 @@ ext {
 
     DEPENDENCY_GROUP_ID = 'com.jasonstudio.jy.androidlib'
     DEPENDENCY_ARTIFACT_ID = PACKAGE_NAME // the same as the package name in Repository
-    DEPENDENCY_VERSION = '0.2.0'
-
-    BUILD_NUMBER = 3
-
+    DEPENDENCY_VERSION = RELEASE_VERSION
 }
 
 android {
@@ -24,8 +23,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 1
-        versionName DEPENDENCY_VERSION + "." + BUILD_NUMBER
+        versionCode 7
+        versionName RELEASE_VERSION + "." + BUILD_NUMBER
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
